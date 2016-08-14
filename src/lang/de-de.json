@@ -1,7 +1,11 @@
 {
-  "welcome":"Willkommen",
-  "exit":"Moechtest du das Programm wirklich schliessen?",
-  "error":"Ein unerwarteter Fehler ist aufgetreten und das Programm musste beendet werden!",
-  "button_dashboard":"Uebersicht",
-  "button_options":"Optionen"
+  "welcome": "Willkommen",
+  "exit": "Moechtest du das Programm wirklich schliessen?",
+  "error": "Ein unerwarteter Fehler ist aufgetreten und das Programm musste beendet werden!",
+  "button_dashboard": "Uebersicht",
+  "button_options": "Optionen",
+  "button_options_save": "Speichern",
+  "button_options_login": "LogIn",
+  "button_options_reset": "Zuruecksetzen",
+  "button_options_next": "Weiter"
 }

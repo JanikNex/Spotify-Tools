@@ -1,9 +1,15 @@
 from src.gui.spotiGUI import *
+from src.spotipy.util import *
+from src.handler.spotifyHandler import *
+from src.util.controller import *
 
 
 class GUIController(object):
     def __init__(self, controller):
-        self.gui = SpotiGUI(self, [self.cb_tab1, self.cb_tab2])
+        """
+        :param controller: SpotifyTools()
+        """
+        self.gui = SpotiGUI(self, [self.cb_tab1, self.cb_tab2, self.cb_options_login, self.cb_options_next])
         self.controller = controller
         self.GUIchangeLanguage()
         self.mode = 'STARTUP'
@@ -21,6 +27,10 @@ class GUIController(object):
     def GUIchangeLanguage(self):
         self.gui.menuButton1.config(text=self.controller.getLanguageHandler().getString("button_dashboard"))
         self.gui.menuButton2.config(text=self.controller.getLanguageHandler().getString("button_options"))
+        self.gui.optionButton1.config(text=self.controller.getLanguageHandler().getString("button_options_save"))
+        self.gui.optionButton2.config(text=self.controller.getLanguageHandler().getString("button_options_login"))
+        self.gui.optionButton3.config(text=self.controller.getLanguageHandler().getString("button_options_reset"))
+        self.gui.optionButton4.config(text=self.controller.getLanguageHandler().getString("button_options_next"))
 
 
     def GUIupdateMode(self):
@@ -30,30 +40,47 @@ class GUIController(object):
                 self.setMode('DASHBOARD')
             else:
                 self.setMode('OPTIONS')
-        if self.mode == 'OPTIONS':
+        elif self.mode == 'OPTIONS':
+            self.gui.optionFrame.place(x=0, y=self.gui.height // 12, width=self.gui.width, height=self.gui.height // 12 * 11)
+            if not self.controller.getSpotifyHandler().isConnected():
+                self.gui.optionButton2.pack(side=LEFT)
             self.gui.optionButton1.pack(side=LEFT)
-            self.gui.optionButton2.pack(side=LEFT)
             self.gui.optionButton3.pack(side=LEFT)
-            self.gui.optionButton4.pack(side=LEFT)
-        if self.mode == 'DASHBOARD':
-            pass
+        elif self.mode == 'DASHBOARD':
+            print(self.controller.getSpotifyHandler().getSpotifyAPIConnector().search(q='artist:Skrillex', type='artist'))
+            # self.gui.dashboardFrame.place(x=0, y=self.gui.height // 12, width=self.gui.width, height=self.gui.height // 12 * 11)
+            # self.gui.dashboardLabel1.pack()
+            # data = self.controller.getSpotifyHandler().getSpotifyAPIConnector().current_user_top_artists(limit=1, time_range='short_term')
+            # self.gui.dashboardLabel1.config(text=data["items"]["name"])
 
     def setMode(self, mode):
         self.mode = mode
         self.GUIupdateMode()
 
     def hideAll(self):
+        self.gui.optionFrame.place_forget()
+        self.gui.dashboardFrame.place_forget()
         self.gui.optionButton1.pack_forget()
         self.gui.optionButton2.pack_forget()
         self.gui.optionButton3.pack_forget()
+        self.gui.optionEntry1.pack_forget()
         self.gui.optionButton4.pack_forget()
         
     def cb_options_save(self):
         pass
     
     def cb_options_login(self):
-        pass
-    
+        if not self.controller.getSpotifyHandler().tryLogIn():
+            self.gui.optionEntry1.pack(side=LEFT)
+            self.gui.optionButton4.pack(side=LEFT)
+
+    def cb_options_next(self):
+        if self.gui.optionTextVar1.get() != "":
+            self.gui.optionEntry1.pack_forget()
+            self.gui.optionButton4.pack_forget()
+            self.controller.getSpotifyHandler().logInWithURL(self.gui.optionTextVar1.get())
+            self.gui.optionTextVar1.set('')
+
     def cb_tab1(self):
         self.setMode('DASHBOARD')
         

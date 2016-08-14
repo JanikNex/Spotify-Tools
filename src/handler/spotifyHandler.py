@@ -1,4 +1,4 @@
-from src.spotipy import *
+from src.spotipy.client import *
 from src.spotipy.util import *
 from src.handler.configHandler import *
 from src.util.controller import *
@@ -12,7 +12,8 @@ class SpotifyHandler(object):
         """
         self.controller = controller
         self.token = None
-        self.scope = None
+        self.scope = "user-top-read"
+        self.spotifyAPIConnector = None
 
     def tryLogIn(self):
         try:
@@ -22,19 +23,43 @@ class SpotifyHandler(object):
                                                jsonHandler.getData()["clientID"],
                                                jsonHandler.getData()["clientSecret"])
             del jsonHandler
-            return True
+            if self.token is None:
+                return False
+            elif self.token is not None:
+                self.spotifyAPIConnector = Spotify(self.token, True)
+                return True
         except:
             return False
 
     def cachedTokenAvailable(self):
         jsonHandler = JSONHandler()
         jsonHandler.openNewFile("secret")
-        oauth = oauth2.SpotifyOAuth(jsonHandler.getData()["clientID"],
-                                    jsonHandler.getData()["clientSecret"])
+        result = needLogIn(jsonHandler.getData()["username"], self.scope,
+                                               jsonHandler.getData()["clientID"],
+                                               jsonHandler.getData()["clientSecret"])
+        if result:
+            self.token = getCachedToken(jsonHandler.getData()["username"], self.scope,
+                                               jsonHandler.getData()["clientID"],
+                                               jsonHandler.getData()["clientSecret"])
+        if self.token is not None:
+            self.spotifyAPIConnector = Spotify(self.token, True)
         del jsonHandler
-        if oauth.get_cached_token() is not None:
-            del oauth
-            return True
-        else:
-            del oauth
-            return False
+        return result
+
+    def logInWithURL(self, url):
+        #try:
+            jsonHandler = JSONHandler()
+            jsonHandler.openNewFile("secret")
+            self.token = getTokenFromURL(jsonHandler.getData()["username"], url, self.scope,
+                                                   jsonHandler.getData()["clientID"],
+                                                   jsonHandler.getData()["clientSecret"])
+            del jsonHandler
+            self.spotifyAPIConnector = Spotify(self.token, True)
+        #except:
+        #    pass
+
+    def isConnected(self):
+        return isinstance(self.spotifyAPIConnector, Spotify)
+
+    def getSpotifyAPIConnector(self):
+        return self.spotifyAPIConnector

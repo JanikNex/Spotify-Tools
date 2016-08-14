@@ -4,11 +4,11 @@ from __future__ import print_function
 import os
 import subprocess
 from . import oauth2
-import spotipy
+import src.spotipy
 
 
 def prompt_for_user_token(username, scope=None, client_id=None,
-                          client_secret=None, redirect_uri=None):
+                          client_secret=None, redirect_uri="http://www.google.com"):
     ''' prompts the user to login if necessary and returns
         the user token suitable for use with the spotipy.Spotify
         constructor
@@ -23,28 +23,26 @@ def prompt_for_user_token(username, scope=None, client_id=None,
 
     '''
 
-    if not client_id:
-        client_id = os.getenv('SPOTIPY_CLIENT_ID')
+    sp_oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri,
+                                   scope=scope, cache_path=".cache-" + username)
 
-    if not client_secret:
-        client_secret = os.getenv('SPOTIPY_CLIENT_SECRET')
+    # try to get a valid token for this user, from the cache,
+    # if not in the cache, the create a new (this will send
+    # the user to a web page where they can authorize this app)
 
-    if not redirect_uri:
-        redirect_uri = os.getenv('SPOTIPY_REDIRECT_URI')
+    token_info = sp_oauth.get_cached_token()
 
-    if not client_id:
-        print('''
-            You need to set your Spotify API credentials. You can do this by
-            setting environment variables like so:
+    if not token_info:
+        auth_url = sp_oauth.get_authorize_url()
+        try:
+            subprocess.call(["open", auth_url])
+        except:
+            print("Please navigate here: %s" % auth_url)
+    else:
+        return token_info
 
-            export SPOTIPY_CLIENT_ID='your-spotify-client-id'
-            export SPOTIPY_CLIENT_SECRET='your-spotify-client-secret'
-            export SPOTIPY_REDIRECT_URI='your-app-redirect-url'
-
-            Get your credentials at
-                https://developer.spotify.com/my-applications
-        ''')
-        raise spotipy.SpotifyException(550, -1, 'no credentials set')
+def needLogIn(username, scope=None, client_id=None,
+                          client_secret=None, redirect_uri="http://www.google.com"):
 
     sp_oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri,
                                    scope=scope, cache_path=".cache-" + username)
@@ -56,36 +54,36 @@ def prompt_for_user_token(username, scope=None, client_id=None,
     token_info = sp_oauth.get_cached_token()
 
     if not token_info:
-        print('''
+        return False
+    else:
+        return True
 
-            User authentication requires interaction with your
-            web browser. Once you enter your credentials and
-            give authorization, you will be redirected to
-            a url.  Paste that url you were directed to to
-            complete the authorization.
 
-        ''')
-        auth_url = sp_oauth.get_authorize_url()
-        try:
-            subprocess.call(["open", auth_url])
-            print("Opening %s in your browser" % auth_url)
-        except:
-            print("Please navigate here: %s" % auth_url)
+def getTokenFromURL(username, url, scope=None, client_id=None,
+                    client_secret=None, redirect_uri="http://www.google.com"):
+    sp_oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri,
+                                   scope=scope, cache_path=".cache-" + username)
 
-        print()
-        print()
-        try:
-            response = input("Enter the URL you were redirected to: ")
-        except NameError:
-            response = input("Enter the URL you were redirected to: ")
+    code = sp_oauth.parse_response_code(url)
+    token_info = sp_oauth.get_access_token(code)
 
-        print()
-        print()
-
-        code = sp_oauth.parse_response_code(response)
-        token_info = sp_oauth.get_access_token(code)
     # Auth'ed API request
     if token_info:
         return token_info['access_token']
     else:
         return None
+
+def getCachedToken(username, scope=None, client_id=None,
+                          client_secret=None, redirect_uri="http://www.google.com"):
+
+    sp_oauth = oauth2.SpotifyOAuth(client_id, client_secret, redirect_uri,
+                                   scope=scope, cache_path=".cache-" + username)
+
+    # try to get a valid token for this user, from the cache,
+    # if not in the cache, the create a new (this will send
+    # the user to a web page where they can authorize this app)
+
+    token_info = sp_oauth.get_cached_token()
+
+    if token_info is not None:
+        return token_info
