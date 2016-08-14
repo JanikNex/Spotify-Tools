@@ -1,6 +1,5 @@
 import json as js
 
-
 class JSONHandler(object):
     def __init__(self, directory="json"):
         self.filepath = None

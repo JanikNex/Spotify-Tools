@@ -2,3 +2,9 @@
 .gitignore
 .idea/
 src/json/secret.json
+src/__pycache__/
+src/cache/usercache.json
+src/gui/__pycache__/
+src/handler/__pycache__/
+src/spotipy/__pycache__/
+src/util/__pycache__/

@@ -1,5 +1,5 @@
-from spotipy import *
-from spotipy.util import *
+from src.spotipy import *
+from src.spotipy.util import *
 from src.handler.configHandler import *
 from src.util.controller import *
 from src.handler.jsonHandler import *
@@ -24,4 +24,17 @@ class SpotifyHandler(object):
             del jsonHandler
             return True
         except:
+            return False
+
+    def cachedTokenAvailable(self):
+        jsonHandler = JSONHandler()
+        jsonHandler.openNewFile("secret")
+        oauth = oauth2.SpotifyOAuth(jsonHandler.getData()["clientID"],
+                                    jsonHandler.getData()["clientSecret"])
+        del jsonHandler
+        if oauth.get_cached_token() is not None:
+            del oauth
+            return True
+        else:
+            del oauth
             return False

@@ -1,4 +1,7 @@
 {
   "welcome":"Willkommen",
-  "error":"Ein unerwarteter Fehler ist aufgetreten und das Programm musste beendet werden!"
+  "exit":"Moechtest du das Programm wirklich schliessen?",
+  "error":"Ein unerwarteter Fehler ist aufgetreten und das Programm musste beendet werden!",
+  "button_dashboard":"Uebersicht",
+  "button_options":"Optionen"
 }
