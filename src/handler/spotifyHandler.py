@@ -62,4 +62,7 @@ class SpotifyHandler(object):
         return isinstance(self.spotifyAPIConnector, Spotify)
 
     def getSpotifyAPIConnector(self):
+        """
+        :return: Spotify()
+        """
         return self.spotifyAPIConnector

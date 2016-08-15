@@ -1,7 +1,9 @@
 from src.gui.spotiGUI import *
 from src.spotipy.util import *
+from src.spotipy.client import *
 from src.handler.spotifyHandler import *
 from src.util.controller import *
+import json as js
 
 
 class GUIController(object):
@@ -47,11 +49,13 @@ class GUIController(object):
             self.gui.optionButton1.pack(side=LEFT)
             self.gui.optionButton3.pack(side=LEFT)
         elif self.mode == 'DASHBOARD':
-            print(self.controller.getSpotifyHandler().getSpotifyAPIConnector().search(q='artist:Skrillex', type='artist'))
-            # self.gui.dashboardFrame.place(x=0, y=self.gui.height // 12, width=self.gui.width, height=self.gui.height // 12 * 11)
-            # self.gui.dashboardLabel1.pack()
-            # data = self.controller.getSpotifyHandler().getSpotifyAPIConnector().current_user_top_artists(limit=1, time_range='short_term')
-            # self.gui.dashboardLabel1.config(text=data["items"]["name"])
+            self.gui.dashboardFrame.place(x=0, y=self.gui.height // 12, width=self.gui.width, height=self.gui.height // 12 * 11)
+            self.gui.dashboardLabel1.pack()
+            data = self.controller.getSpotifyHandler().getSpotifyAPIConnector().track("2q5IyYEn00qHegsCZo3sQF")
+            print(data)
+            show = data['name']+'\n'+data['artists']['name']
+            print(show)
+            self.gui.dashboardLabel1.config(text=show)
 
     def setMode(self, mode):
         self.mode = mode

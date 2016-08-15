@@ -20,4 +20,7 @@ class SpotifyTools(object):
         return self.gui
 
     def getSpotifyHandler(self):
+        """
+        :return: SpotifyHandler()
+        """
         return self.SpotifyHandler

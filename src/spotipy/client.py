@@ -42,8 +42,8 @@ class Spotify(object):
             print(user)
     '''
 
-    trace = False  # Enable tracing?
-    trace_out = False
+    trace = True  # Enable tracing?
+    trace_out = True
     max_get_retries = 10
 
     def __init__(self, auth=None, requests_session=True,
